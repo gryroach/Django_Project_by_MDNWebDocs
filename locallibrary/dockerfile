@@ -2,7 +2,7 @@
 FROM python:3.8.6-alpine
 
 # рабочая директория внутри проекта
-WORKDIR /usr/src/app
+WORKDIR /usr/src/locallibrary/
 
 # переменные окружения для python
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -21,4 +21,4 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # проверка запуска postgresql, очистка базы и включение миграций
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+# ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
