@@ -1,4 +1,6 @@
+from django.contrib.admin.decorators import register
 from django.db import models
+from django.db.models.fields.related import ForeignKey
 from django.urls import reverse
 import uuid
 
@@ -31,6 +33,7 @@ class Book(models.Model):
     genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
     # ManyToManyField used because genre can contain many books. Books can cover many genres.
     # Genre class has already been defined so we can specify the object above.
+    language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         """
@@ -43,6 +46,13 @@ class Book(models.Model):
         Returns the url to access a particular book instance.
         """
         return reverse('book-detail', args=[str(self.id)])
+
+    def display_genre(self):
+        """
+        Creates a string for the Genre. This is required to display genre in Admin.
+        """
+        return ', '.join([ genre.name for genre in self.genre.all()[:3] ])
+    display_genre.short_description = 'Genre'
 
 
 class BookInstance(models.Model):
@@ -94,3 +104,13 @@ class Author(models.Model):
         String for representing the Model object.
         """
         return '{0}, {1}'.format(self.last_name, self.first_name)
+
+
+class Language(models.Model):
+    """
+    Model language of book
+    """
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
