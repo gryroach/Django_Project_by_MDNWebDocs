@@ -1,7 +1,9 @@
-from django.contrib.admin.decorators import register
+# from django.contrib.admin.decorators import register
 from django.db import models
-from django.db.models.fields.related import ForeignKey
+# from django.db.models.fields.related import ForeignKey
 from django.urls import reverse
+from django.contrib.auth.models import User
+from datetime import date
 import uuid
 
 
@@ -11,6 +13,7 @@ class Genre(models.Model):
     """
     name = models.CharField(max_length=200, help_text="Enter a book "
                             "genre (e.g. Science Fiction, French Poetry etc.)")
+    objects = models.Manager()
 
     def __str__(self):
         """
@@ -34,6 +37,7 @@ class Book(models.Model):
     # ManyToManyField used because genre can contain many books. Books can cover many genres.
     # Genre class has already been defined so we can specify the object above.
     language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
+    objects = models.Manager()
 
     def __str__(self):
         """
@@ -64,6 +68,9 @@ class BookInstance(models.Model):
     book = models.ForeignKey('Book', on_delete=models.SET_NULL, null=True)
     imprint = models.CharField(max_length=200)
     due_back = models.DateField(null=True, blank=True)
+    borrower = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    objects = models.Manager()
 
     LOAN_STATUS = (
         ('m', 'Maintenance'),
@@ -76,12 +83,20 @@ class BookInstance(models.Model):
 
     class Meta:
         ordering = ["due_back"]
+        permissions = (("can_mark_returned", "Set book as returned"),)
 
     def __str__(self):
         """
         String for representing the Model object
         """
         return '{0} ({1})'.format(self.id, self.book.title)
+
+    # expiration check
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+        return False
 
 
 class Author(models.Model):
@@ -92,6 +107,10 @@ class Author(models.Model):
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(null=True, blank=True)
     date_of_death = models.DateField('Died', null=True, blank=True)
+    objects = models.Manager()
+
+    class Meta:
+        ordering = ['last_name']
 
     def get_absolute_url(self):
         """
@@ -111,6 +130,7 @@ class Language(models.Model):
     Model language of book
     """
     name = models.CharField(max_length=20)
+    objects = models.Manager()
 
     def __str__(self):
         return self.name
