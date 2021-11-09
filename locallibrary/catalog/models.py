@@ -111,6 +111,7 @@ class Author(models.Model):
 
     class Meta:
         ordering = ['last_name']
+        permissions = (("can_change", "Create, update or delete authors"),)
 
     def get_absolute_url(self):
         """

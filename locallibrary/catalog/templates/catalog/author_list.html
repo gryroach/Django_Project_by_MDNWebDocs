@@ -9,6 +9,10 @@
       {% for author in author_list %}
       <li>
         <a href="{{ author.get_absolute_url }}">{{ author }}</a>
+        {% if perms.catalog.can_change %}
+          | <a href="{% url 'author_update' author.pk %}">Update</a> |
+          <a href="{% url 'author_delete' author.pk %}">Delete</a>
+          {% endif %}
         <p>Дата рождения: {{ author.date_of_birth }}, Дата смерти {{ author.date_of_death }}</p>
       </li>
       {% endfor %}
@@ -16,5 +20,9 @@
     </ul>
     {% else %}
       <p>There are no authors.</p>
-    {% endif %} 
+    {% endif %}
+    {% if perms.catalog.can_change %}
+    <br>
+    <p> <a href="{% url 'author_create' %}">Create new author</a> </p>
+    {% endif %}
 {% endblock %}
