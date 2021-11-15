@@ -25,7 +25,7 @@ admin.site.register(Author, AuthorAdmin)
 # add BooksInstance information while add book   
 class BooksInstanceInline(admin.TabularInline):
     model = BookInstance
-    # add empty fileds
+    # add empty fields
     extra = 0
 
 

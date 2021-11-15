@@ -62,11 +62,11 @@ class AuthorDetailView(generic.DetailView):
 
 class LoanedBooksByUserListView(LoginRequiredMixin, generic.ListView):
     """
-    Generic class-based view listing books on loan to current user.
+    Обобщённый класс отображения списка взятых книг текущим пользователем.
     """
     model = BookInstance
     template_name = 'catalog/bookinstance_list_borrowed_user.html'
-    paginate_by = 10
+    paginate_by = 5
 
     def get_queryset(self):
         return BookInstance.objects.filter(borrower=self.request.user).filter(status__exact='o').order_by('due_back')
@@ -87,9 +87,12 @@ class AllBorrowedBooks(PermissionRequiredMixin, generic.ListView):
 
 @permission_required('catalog.can_mark_returned')
 def renew_book_librarian(request, pk):
+    """
+    Функция отображения обновления экземпляра BookInstance библиотекарем
+    """
     book_inst = get_object_or_404(BookInstance, pk=pk)
 
-    # Если данный запрос типа POST, тогда
+    # Если это POST-запрос, тогда обработать данные формы
     if request.method == 'POST':
 
         # Создаём экземпляр формы и заполняем данными из запроса (связывание, binding):
